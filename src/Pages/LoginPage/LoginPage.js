@@ -1,8 +1,10 @@
 import React, { Component } from 'react'
 import { Grid, Form, Button, Segment } from 'semantic-ui-react'
-import AuthenticationService from '../../Services/AuthenticationService'
+import login from '../../Services/AuthenticationService'
 import StorageProvider from '../../Services/StorageProvider'
 import jsonWebTokenService from 'jsonwebtoken'
+import axios from 'axios'
+import qs from 'qs'
 
 class LoginPage extends Component {
     constructor() {
@@ -13,7 +15,7 @@ class LoginPage extends Component {
             password: null
         }
 
-        this.auth = new AuthenticationService()
+        this.login = login
         this.localForage = StorageProvider
         this.handleSubmit = this.handleSubmit.bind(this)
         this.handleChange = this.handleChange.bind(this)
@@ -28,15 +30,17 @@ class LoginPage extends Component {
 
     handleSubmit() {
         this.setState({ loading: true })
-        try {
-            const { username, password } = this.state
-            this.auth.login().then((jwt) => {
-                const isUserValid = this.saveJwt(jwt)
-                if (isUserValid) { return true }
+        const { username, password } = this.state
+        axios.post('http://127.0.0.1:8000/login/',  qs.stringify({username, password}), {credentials: 'same-origin'})
+        .then((response) => {
+            axios.get('http://127.0.0.1:8000/post/', {headers: {'Authorization': `JWT ${response.data['token']}`, "Access-Control-Allow-Origin": "*", 'Content-Type': 'application/json'}}).then((response) => {
+                console.log(response)
+            }, (error) => {
+                console.log(error)
             })
-        } catch (err) {
-            console.log(err)
-        }
+        }, (error) => {
+            console.log(error);
+        })
     }
 
     async saveJwt(jwt) {
