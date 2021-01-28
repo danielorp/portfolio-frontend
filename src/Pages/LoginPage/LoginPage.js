@@ -20,33 +20,33 @@ class LoginPage extends Component {
         this.saveJwt = this.saveJwt.bind(this)
     }
 
-    handleChange (target, data) {
+    handleChange(target, data) {
         this.setState({
             [data.name]: data.value
         })
     }
 
-    handleSubmit () {
-        this.setState({loading: true})
+    handleSubmit() {
+        this.setState({ loading: true })
         try {
-            const {username, password} = this.state
-            const jwt = this.auth.doLogin(username, password)
-            const isUserValid = this.saveJwt(jwt)
-            if (isUserValid)
-            { return true}
+            const { username, password } = this.state
+            this.auth.login().then((jwt) => {
+                const isUserValid = this.saveJwt(jwt)
+                if (isUserValid) { return true }
+            })
         } catch (err) {
             console.log(err)
         }
     }
 
-    async saveJwt (jwt) {
+    async saveJwt(jwt) {
         try {
-          if (jwt) {
-            const decodedJwt = jsonWebTokenService.decode(jwt)
-            await this.localforage.setItem('jwt_usuario', jwt)
-            await this.localforage.setItem('dados_usuario', decodedJwt)
-            return true
-          }
+            if (jwt) {
+                const decodedJwt = jsonWebTokenService.decode(jwt)
+                await this.localforage.setItem('jwt_usuario', jwt)
+                await this.localforage.setItem('dados_usuario', decodedJwt)
+                return true
+            }
         } catch (err) {
             if (err instanceof jsonWebTokenService.JsonWebTokenError) return false
             throw err
