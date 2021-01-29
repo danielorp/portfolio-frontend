@@ -3,8 +3,8 @@ import { Grid, Form, Button, Segment } from 'semantic-ui-react'
 import login from '../../Services/AuthenticationService'
 import StorageProvider from '../../Services/StorageProvider'
 import jsonWebTokenService from 'jsonwebtoken'
-import axios from 'axios'
 import qs from 'qs'
+import http from '../../Services/RequestService'
 
 class LoginPage extends Component {
     constructor() {
@@ -15,7 +15,7 @@ class LoginPage extends Component {
             password: null
         }
 
-        this.login = login
+        this.http = http
         this.localForage = StorageProvider
         this.handleSubmit = this.handleSubmit.bind(this)
         this.handleChange = this.handleChange.bind(this)
@@ -31,9 +31,9 @@ class LoginPage extends Component {
     handleSubmit() {
         this.setState({ loading: true })
         const { username, password } = this.state
-        axios.post('http://127.0.0.1:8000/login/',  qs.stringify({username, password}), {credentials: 'same-origin'})
+        http.post('login/',  qs.stringify({username, password}))
         .then((response) => {
-            axios.get('http://127.0.0.1:8000/post/', {headers: {'Authorization': `JWT ${response.data['token']}`, "Access-Control-Allow-Origin": "*", 'Content-Type': 'application/json'}}).then((response) => {
+            http.get('post/', {headers: {'Authorization': `JWT ${response.data['token']}`}}).then((response) => {
                 console.log(response)
             }, (error) => {
                 console.log(error)
