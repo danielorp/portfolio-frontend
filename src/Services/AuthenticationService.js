@@ -1,11 +1,13 @@
-import axios from 'axios'
+import http from '../Services/RequestService'
 import qs from 'qs'
 
 const login = (username, password) => new Promise((resolve, reject) => {
-  let userData = {username: '', password: ''}
-  axios.post('http://localhost:8000/login/', qs.stringify(userData), (err, res) => {
-    console.log(err)
-  })
+  http.post('login/', qs.stringify({ username, password }))
+    .then((response) => {
+      resolve(response)
+    }, (error) => {
+      reject(error)
+    })
 })
 
 export default login;

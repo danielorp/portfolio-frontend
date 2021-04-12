@@ -1,11 +1,8 @@
 import React, { Component } from 'react'
 import { Grid, Form, Button, Segment } from 'semantic-ui-react'
-import login from '../../Services/AuthenticationService'
 import StorageProvider from '../../Services/StorageProvider'
 import jsonWebTokenService from 'jsonwebtoken'
-import qs from 'qs'
-import http from '../../Services/RequestService'
-
+import login from '../../Services/AuthenticationService'
 
 class LoginPage extends Component {
     constructor() {
@@ -15,8 +12,6 @@ class LoginPage extends Component {
             username: null,
             password: null
         }
-
-        this.http = http
         this.localForage = StorageProvider
         this.handleSubmit = this.handleSubmit.bind(this)
         this.handleChange = this.handleChange.bind(this)
@@ -32,15 +27,11 @@ class LoginPage extends Component {
     handleSubmit() {
         this.setState({ loading: true })
         const { username, password } = this.state
-        http.post('login/',  qs.stringify({username, password}))
-        .then((response) => {
-            http.get('post/', {headers: {'Authorization': `JWT ${response.data['token']}`}}).then((response) => {
-                console.log(response)
-            }, (error) => {
-                console.log(error)
-            })
-        }, (error) => {
-            console.log(error);
+
+        login(username, password).then(response => {
+            console.log('Logado com sucesso!')
+        }).catch((error) => {
+            console.log(`Falha no login: ${error}`)
         })
     }
 
