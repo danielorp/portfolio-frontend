@@ -2,7 +2,7 @@ import './Login.css'
 import React, { Component, useState } from 'react'
 import { Grid, Form, Button, Segment } from 'semantic-ui-react'
 import StorageProvider from '../../Services/StorageProvider'
-import jsonWebTokenService from 'jsonwebtoken'
+import jwt_decode from 'jwt-decode'
 import login from '../../Services/AuthenticationService'
 import { withRouter } from 'react-router';
 import PropTypes from 'prop-types';
@@ -15,6 +15,7 @@ function Login({ setToken }) {
     const handleSubmit = async e => {
         e.preventDefault();
         const token = await handleLogin(username, password);
+        setToken(token)
     }
 
     return (
@@ -68,7 +69,6 @@ function Login({ setToken }) {
             </Grid>
         </div>
     )
-
 }
 
 Login.propTypes = {
@@ -77,11 +77,26 @@ Login.propTypes = {
 
 async function handleLogin(username, password) {
 
-    login(username, password).then((token) => {
-        console.log(`Sucesso no Login`)
+    return login(username, password).then((response) => {
+        var token = response.data.token
+        if (isTokenStillValid(token)){
+            console.log(`Sucesso no Login`)
+            return token
+        }
     }).catch((error) => {
         console.log(`Falha no login: ${error}`)
+        return null
     })
+}
+
+function isTokenStillValid(token) {
+    let decoded = jwt_decode(token)
+    let currentDate = new Date();
+    if (decoded.exp * 1000 < currentDate.getTime()) {
+        return false
+    } else {
+        return true  
+    }
 }
 
 
