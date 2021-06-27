@@ -1,90 +1,58 @@
-import React, { Component } from 'react'
+import './Login.css'
+import React, { Component, useState } from 'react'
 import { Grid, Form, Button, Segment } from 'semantic-ui-react'
 import StorageProvider from '../../Services/StorageProvider'
 import jsonWebTokenService from 'jsonwebtoken'
 import login from '../../Services/AuthenticationService'
+import { withRouter } from 'react-router';
+import PropTypes from 'prop-types';
 
-class LoginPage extends Component {
-    constructor() {
-        super()
-        this.state = {
-            loading: false,
-            username: null,
-            password: null
-        }
-        this.localForage = StorageProvider
-        this.handleSubmit = this.handleSubmit.bind(this)
-        this.handleChange = this.handleChange.bind(this)
-        this.saveJwt = this.saveJwt.bind(this)
+function Login({ setToken }) {
+
+    const [username, setUserName] = useState();
+    const [password, setPassword] = useState();
+
+    const handleSubmit = async e => {
+        e.preventDefault();
+        const token = await handleLogin(username, password);
     }
 
-    handleChange(target, data) {
-        this.setState({
-            [data.name]: data.value
-        })
-    }
-
-    handleSubmit() {
-        this.setState({ loading: true })
-        const { username, password } = this.state
-
-        login(username, password).then(response => {
-            console.log('Logado com sucesso!')
-        }).catch((error) => {
-            console.log(`Falha no login: ${error}`)
-        })
-    }
-
-    async saveJwt(jwt) {
-        try {
-            if (jwt) {
-                const decodedJwt = jsonWebTokenService.decode(jwt)
-                await this.localforage.setItem('jwt_usuario', jwt)
-                await this.localforage.setItem('dados_usuario', decodedJwt)
-                return true
-            }
-        } catch (err) {
-            if (err instanceof jsonWebTokenService.JsonWebTokenError) return false
-            throw err
-        }
-    }
-
-    render() {
-        return (
+    return (
+        <div className="login-wrapper">
             <Grid columns={1} padded style={{ height: '100vh' }} verticalAlign='middle' className='login-wrapper'>
                 <Grid.Row as='main' centered>
                     <Grid.Column largeScreen={5} computer={5} mobile={5}>
                         <Segment id='loginForm'>
-                            <Form onSubmit={this.handleSubmit}>
+                            <Form onSubmit={handleSubmit}>
                                 <Form.Input
-                                    disabled={this.state.loading}
+                                    //disabled={this.state.loading}
                                     focus
                                     icon='user'
                                     iconPosition='left'
-                                    loading={this.state.loading}
+                                    //loading={this.state.loading}
                                     name='username'
                                     fluid
                                     label='Usuário'
-                                    onChange={this.handleChange}
+                                    onChange={e => setUserName(e.target.value)}
                                     placeholder='Seu usuário'
                                 />
 
                                 <Form.Input
-                                    disabled={this.state.loading}
+                                    //disabled={this.state.loading}
                                     icon='lock'
                                     iconPosition='left'
-                                    loading={this.state.loading}
+                                    //loading={this.state.loading}
                                     name='password'
                                     fluid
                                     label='Senha'
-                                    onChange={this.handleChange}
+                                    onChange={e => setPassword(e.target.value)}
                                     type='password'
                                     placeholder='Sua senha'
                                 />
 
                                 <Button
-                                    disabled={this.state.loading}
-                                    loading={this.state.loading}
+                                    //disabled={this.state.loading}
+                                    //loading={this.state.loading}
                                     size='huge'
                                     fluid
                                     content='Entrar'
@@ -98,9 +66,23 @@ class LoginPage extends Component {
                     </Grid.Column>
                 </Grid.Row>
             </Grid>
+        </div>
+    )
 
-        )
-    }
 }
 
-export default LoginPage
+Login.propTypes = {
+    setToken: PropTypes.func.isRequired
+};
+
+async function handleLogin(username, password) {
+
+    login(username, password).then((token) => {
+        console.log(`Sucesso no Login`)
+    }).catch((error) => {
+        console.log(`Falha no login: ${error}`)
+    })
+}
+
+
+export default withRouter(Login)
