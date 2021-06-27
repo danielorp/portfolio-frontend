@@ -5,9 +5,12 @@ import StorageProvider from '../../Services/StorageProvider'
 import jwt_decode from 'jwt-decode'
 import login from '../../Services/AuthenticationService'
 import { withRouter } from 'react-router';
+import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
 function Login({ setToken }) {
+
+    let history = useHistory();
 
     const [username, setUserName] = useState();
     const [password, setPassword] = useState();
@@ -15,7 +18,13 @@ function Login({ setToken }) {
     const handleSubmit = async e => {
         e.preventDefault();
         const token = await handleLogin(username, password);
-        setToken(token)
+        if (token) {
+            setToken(token)
+            history.push("/")
+        }
+        else {
+            alert('Deu ruim')
+        }
     }
 
     return (
