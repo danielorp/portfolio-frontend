@@ -1,18 +1,20 @@
 import { useHistory } from "react-router-dom";
 import http from '../../Services/RequestService'
+import curlirize from 'axios-curlirize';
+
+curlirize(http);
 
 export default function Post() {
 
   let history = useHistory();
 
   function handleClick() {
-    http.get('post/').then((response) => {
+    http.get('post/', {withCredentials: true}).then((response) => {
       console.log(response)
     }, (error) => {
       console.log(error)
     })
     history.push("/post");
-    alert('Foi pra pagina')
   }
 
     return (
