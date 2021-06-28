@@ -1,5 +1,5 @@
 export default function Home() {
     return (
-      <div>texto dentro do component Home</div>
+      <div>texto dentro do component Home {}</div>
     );
   }

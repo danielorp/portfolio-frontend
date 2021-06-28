@@ -14,8 +14,7 @@ import {
 function PrivateRoute({ component: Component, logged_in, ...rest }) {
   return (
     <Route
-      {...rest}
-      render={(props) => logged_in === true
+      {...rest}      render={(props) => logged_in === true
         ? <Component {...props} />
         : <Redirect to={{ pathname: '/login', state: { from: props.location } }} />}
     />
@@ -25,6 +24,7 @@ function PrivateRoute({ component: Component, logged_in, ...rest }) {
 export default function App() {
 
   const [token, setToken] = useState();
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   return (
     <div className="wrapper">
@@ -38,11 +38,11 @@ export default function App() {
 
           <Switch>
             <Route path="/login" render={() =>
-              <Login setToken={setToken} />
+              <Login setToken={setToken} setIsLoggedIn={setIsLoggedIn} />
             } />
             <Route path="/home" component={Home} />
             <Route path="/" exact component={Home} />
-            <PrivateRoute logged_in={false} path='/post' component={Post} />
+            <PrivateRoute logged_in={isLoggedIn} path='/post' component={Post} />
           </Switch>
         </div>
       </Router>

@@ -8,7 +8,7 @@ import { withRouter } from 'react-router';
 import { useHistory } from 'react-router-dom';
 import PropTypes from 'prop-types';
 
-function Login({ setToken }) {
+function Login({ setToken, setIsLoggedIn }) {
 
     let history = useHistory();
 
@@ -19,11 +19,17 @@ function Login({ setToken }) {
         e.preventDefault();
         const token = await handleLogin(username, password);
         if (token) {
-            setToken(token)
-            history.push("/")
+            setIsLoggedIn(true)
+            setToken({
+                'token': token
+            })
+            history.push("/post")
         }
         else {
-            alert('Deu ruim')
+            setIsLoggedIn(false)
+            setToken({
+                'token': null
+            })
         }
     }
 
